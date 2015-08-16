@@ -1,0 +1,42 @@
+---
+
+- name: Download the tar ball
+  get_url: url="{{ pyfsrc_download_url }}" dest="{{ pyfsrc_src_pkg_path }}"
+
+- name: Untar the source package
+  unarchive:
+    src: "{{ pyfsrc_src_pkg_path }}"
+    dest: "{{ pyfsrc_download_dir }}"
+    creates: "{{ pyfsrc_src_dir_path }}"
+    copy: no
+
+- name: Run configure
+  command: ./configure
+  args:
+    chdir: "{{ pyfsrc_src_dir_path }}"
+
+- name: Run make
+  command: make
+  args:
+    chdir: "{{ pyfsrc_src_dir_path }}"
+
+- name: Run make install
+  command: make install
+  args:
+    chdir: "{{ pyfsrc_src_dir_path }}"
+  when: pyfsrc_make_default
+  sudo: yes
+
+- name: Run make altinstall
+  command: make altinstall
+  args:
+    chdir: "{{ pyfsrc_src_dir_path }}"
+  when: not pyfsrc_make_default
+  sudo: yes
+
+- name: Clean up the source files
+  command: rm -r "{{ item }}"
+  with_items:
+    - "{{ pyfsrc_src_pkg_path }}"
+    - "{{ pyfsrc_src_dir_path }}"
+  when: pyfsrc_cleanup_downloads

@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Vineet Naik
+  description: For installing a specific Python version from source
+  license: MIT
+  min_ansible_version: 1.2
+  platforms:
+    - name: GenericLinux
+      versions:
+        - all
+        - any
+  categories:
+  - development
+dependencies: []
