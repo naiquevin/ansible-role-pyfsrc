@@ -1,5 +1,5 @@
-Python-From-Src
-===============
+pyfsrc: Python from source
+==========================
 
 Ansible role for installing a particular version of Python from
 source.
@@ -36,7 +36,7 @@ eg:
       hosts: localhost
       sudo: yes
       roles:
-        - role: python-from-source
+        - role: pyfsrc
           pyfsrc_version: 3.8
 ```
 
