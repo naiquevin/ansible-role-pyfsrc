@@ -11,32 +11,41 @@
     copy: no
 
 - name: Run configure
-  command: ./configure
+  command: ./configure {{ pyfsrc_config_opts }}
   args:
     chdir: "{{ pyfsrc_src_dir_path }}"
+  register: configure_result
+  changed_when: "configure_result.rc == 0"
 
 - name: Run make
   command: make
   args:
     chdir: "{{ pyfsrc_src_dir_path }}"
+  register: make_result
+  changed_when: "make_result.rc == 0"
 
 - name: Run make install
   command: make install
   args:
     chdir: "{{ pyfsrc_src_dir_path }}"
+  register: make_install_result
+  changed_when: "make_install_result.rc == 0"
+  become: yes
   when: pyfsrc_make_default
-  sudo: yes
 
 - name: Run make altinstall
   command: make altinstall
   args:
     chdir: "{{ pyfsrc_src_dir_path }}"
+  register: make_altinstall_result
+  changed_when: "make_altinstall_result.rc == 0"
+  become: yes
   when: not pyfsrc_make_default
-  sudo: yes
 
 - name: Clean up the source files
-  command: rm -r "{{ item }}"
-  with_items:
-    - "{{ pyfsrc_src_pkg_path }}"
-    - "{{ pyfsrc_src_dir_path }}"
+  file:
+    path:
+      - "{{ pyfsrc_src_pkg_path }}"
+      - "{{ pyfsrc_src_dir_path }}"
+    state: absent
   when: pyfsrc_cleanup_downloads

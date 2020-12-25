@@ -1,13 +1,36 @@
 ---
 # tasks file for python-from-src
 
-- set_fact:
-    pyfsrc_exec: "python{{ pyfsrc_version|regex_replace('(\\d+\\.\\d+)\\..*$', '\\\\1') }}"
+- name: Derive python version
+  set_fact:
+    pyfsrc_exec: "python{{ pyfsrc_version|regex_replace('(\\d+\\.\\d+)\\..*$', '\\1') }}"
 
 - name: check if python version installed
   command: "which {{ pyfsrc_exec }}"
-  register: cmd_result
   ignore_errors: yes
+  register: is_installed
+  changed_when: is_installed.rc == 0
 
-- include: install.yml
-  when: pyfsrc_force_install or cmd_result.rc != 0
+- name: install required packages
+  apt:
+    name:
+      - build-essential
+      - python-dev
+      - python3-dev
+      - zlib1g-dev
+      - libssl-dev
+      - libffi-dev
+    state: present
+    autoclean: yes
+  become: yes
+
+- name: install extra system packages
+  apt:
+    name: "{{ pyfsrc_extra_sys_pkgs }}"
+    state: present
+    autoclean: yes
+  become: yes
+
+- name: Install python
+  include: install.yml
+  when: pyfsrc_force_install or is_installed.rc != 0
